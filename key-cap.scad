@@ -42,7 +42,7 @@ module Plot3D(x_range, y_range, z_func, granularity=20, thickness=1) {
 	}
 }
 
-module CapCurve() {
+module CapSurface() {
 	cap_h = cap_w;
 
 	capPosZ = function (x, y) -16^(y/4.2 - 2) + 1/5 * (x/3.3)^2 + 1;
@@ -52,5 +52,21 @@ module CapCurve() {
 	Plot3D([-cap_w/2, cap_w/2], [0, cap_w/2], capPosZ, thickness=1.5);
 }
 
+module CapMask(radius=5) {
+	for(i = [1, 2, 3, 4])
+	rotate([0, 0, 90 * i])
+	difference() {
+		translate([cap_w/2 - radius/2, cap_w/2 - radius/2, 0]) 
+		square(radius, true);
+		color("red")
+		translate([cap_w/2 - radius, cap_w/2 - radius, 0]) 
+		circle(radius, $fn=64);
+	}
+}
+
 cap_w = 20;
-CapCurve();
+
+difference() {
+	import("cap-surface.stl");
+	linear_extrude(10, center=true) CapMask(7);
+}
